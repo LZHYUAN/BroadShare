@@ -1,3 +1,4 @@
+
 namespace BroadShare
 {
     public partial class Form1 : Form
@@ -5,6 +6,25 @@ namespace BroadShare
         public Form1()
         {
             InitializeComponent();
-        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        }      
+
     }
+
 }
