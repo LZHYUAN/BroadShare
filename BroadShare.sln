@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BroadShare", "BroadShare\BroadShare.csproj", "{9A2B224B-E3C9-42D6-97B9-2E9E7F1466CE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9A2B224B-E3C9-42D6-97B9-2E9E7F1466CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A2B224B-E3C9-42D6-97B9-2E9E7F1466CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A2B224B-E3C9-42D6-97B9-2E9E7F1466CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A2B224B-E3C9-42D6-97B9-2E9E7F1466CE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {98CB5259-8473-4CF4-969D-70196DEE007A}
+	EndGlobalSection
+EndGlobal
