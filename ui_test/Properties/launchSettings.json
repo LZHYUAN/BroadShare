@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "ui_test (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "ui_test (Unpackaged)": {
+      "commandName": "Project"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    }
+  }
+}
