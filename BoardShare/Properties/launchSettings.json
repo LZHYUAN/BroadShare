@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "BoardShare (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "BoardShare (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

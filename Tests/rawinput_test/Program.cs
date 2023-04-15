@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Linearstar.Windows.RawInput;
 
 namespace rawinput_test
@@ -7,15 +8,21 @@ namespace rawinput_test
     {
         static void Main(string[] args)
         {
+            var C = new Form1();
+            C.button1_Click();
+
+
+            Task.Delay(-1).Wait();
+
             var Ms = RawInputMouse.GetDevices().OfType<RawInputMouse>();
 
             var M = Ms.Where(_ => _.ProductId != 0 && _.ManufacturerName == "Microsoft").First();
             var window = new MouseRawInputReceiverWindow(M);
+            Task.Run(() => Application.Run());
             window.RawInputEvent += (sender, data) =>
             {
                 Console.WriteLine(data);
             };
-            Task.Delay(-1).Wait();
         }
     }
 
@@ -23,7 +30,7 @@ namespace rawinput_test
     {
         public MouseRawInputReceiverWindow(RawInputMouse mouse)
         {
-            CreateHandle(new CreateParams());
+            base.CreateHandle(new CreateParams());
             Mouse = mouse;
             RawInputMouse.RegisterDevice(Mouse.UsageAndPage, RawInputDeviceFlags.InputSink, this.Handle);
         }
@@ -41,7 +48,7 @@ namespace rawinput_test
         public void Dispose()
         {
             RawInputMouse.UnregisterDevice(Mouse.UsageAndPage);
-            base.ReleaseHandle();
+            base.DestroyHandle();
         }
     }
 }
