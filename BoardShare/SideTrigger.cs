@@ -23,13 +23,14 @@ namespace BoardShare
 
     public class SideTrigger
     {
-        public SideTrigger(Side side = Side.Right, int screenIndex = 2)
+        public SideTrigger(int centerWidth, Side side = Side.Right, int screenIndex = 0)
         {
             Side = side;
             ScreenIndex = screenIndex;
             FrontRange = 0;
             BottomRange = 0;
             Duration = 200;
+            CenterWidth = centerWidth;
 
             var Ms = RawInputMouse.GetDevices().OfType<RawInputMouse>();
             var M = Ms.Where(_ => _.ProductId != 0 && _.ManufacturerName == "Microsoft").First();
@@ -49,6 +50,7 @@ namespace BoardShare
         public bool WithHover { get; set; } = false;
 
         public event Action TriggerEvent;
+        public event Action LeaveEvent;
 
         private MouseRawInputReceiveWindow _rawinput;
 
@@ -65,28 +67,48 @@ namespace BoardShare
         long _startTime = 0;
         bool _leftDown = false;
         bool _rightDown = false;
+        POINT _lastPos = new POINT { X = 0, Y = 0 };
         private void _rawinput_RawInputEvent(object sender, RawInputMouseData data)
         {
             GetCursorPos(out POINT pos);
 
             //--PosCheck
-            int axis = 0;
+            int enterAxis = 0;
+            int leaveAxis = 0;
             Rectangle screen = Screen.AllScreens[ScreenIndex].Bounds;
             if (Side == Side.Left || Side == Side.Right)
             {
-                axis = screen.X;
+                enterAxis = screen.X;
+                leaveAxis = enterAxis + CenterWidth;
                 if (Side == Side.Right)
-                    axis += screen.Width - 1;
-                if (!(pos.X == axis && pos.Y > (screen.Y + FrontRange) && pos.Y < (screen.Y + screen.Height - BottomRange)))
+                {
+                    enterAxis += screen.Width - 1;
+                    leaveAxis = enterAxis - CenterWidth;
+                }
+                if (!(pos.X == enterAxis && pos.Y > (screen.Y + FrontRange) && pos.Y < (screen.Y + screen.Height - BottomRange)))
+                {
+                    if (_lastPos.X>leaveAxis ^ pos.X>leaveAxis)
+                        _Leave();
+                    _lastPos = pos;
                     return;
+                }
             }
             else
             {
-                axis = screen.Y;
+                enterAxis = screen.Y;
+                leaveAxis = enterAxis + CenterWidth;
                 if (Side == Side.Bottom)
-                    axis += screen.Height - 1;
-                if (!(pos.Y == axis && pos.X > (screen.X + FrontRange) && pos.X < (screen.X + screen.Width - BottomRange)))
+                {
+                    enterAxis += screen.Height - 1;
+                    leaveAxis = enterAxis - CenterWidth;
+                }
+                if (!(pos.Y == enterAxis && pos.X > (screen.X + FrontRange) && pos.X < (screen.X + screen.Width - BottomRange)))
+                {
+                    if (_lastPos.Y > leaveAxis ^ pos.Y > leaveAxis)
+                        _Leave();
+                    _lastPos = pos;
                     return;
+                }
             }
 
             //--HoverCheck
@@ -112,7 +134,10 @@ namespace BoardShare
         private void _Trigger()
         {
             TriggerEvent?.Invoke();
-            Debug.WriteLine("TriggerEvent");
+        }
+        private void _Leave()
+        {
+            LeaveEvent?.Invoke();
         }
     }
 }
