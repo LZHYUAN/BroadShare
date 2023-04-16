@@ -44,6 +44,7 @@ namespace BoardShare
         public int ScreenIndex { get; set; }
         public int FrontRange { get; set; } // pixel
         public int BottomRange { get; set; } // pixel
+        public int CenterWidth { get; set; } // pixel
 
         public bool WithHover { get; set; } = false;
 
@@ -65,13 +66,14 @@ namespace BoardShare
         long _startTime = 0;
         bool _leftDown= false;
         bool _rightDown= false;
+        POINT _lastPos =new POINT { X=0,Y =0} ;
         private void _rawinput_RawInputEvent(object sender, RawInputMouseData data)
         {
             GetCursorPos(out POINT pos);
 
             bool trigger = true;
 
-            //PosCheck
+            //--PosCheck
             int axis = 0;
             Rectangle screen = Screen.AllScreens[ScreenIndex].Bounds;
             if (Side == Side.Left || Side == Side.Right)
@@ -91,7 +93,7 @@ namespace BoardShare
                     trigger = false;
             }
 
-            //HoverCheck
+            //--HoverCheck
             if (data.Mouse.Buttons == RawMouseButtonFlags.LeftButtonDown) _leftDown=true;
             if (data.Mouse.Buttons == RawMouseButtonFlags.RightButtonDown) _rightDown=true;
             if (data.Mouse.Buttons == RawMouseButtonFlags.LeftButtonUp) _leftDown = false;
@@ -102,7 +104,7 @@ namespace BoardShare
 
             if (trigger)
             {
-                //TimeCheck
+                //--TimeCheck
                 if (DateTime.Now.Ticks - _lastTime > 50_000)
                     _startTime = DateTime.Now.Ticks;
                 _lastTime = DateTime.Now.Ticks;
