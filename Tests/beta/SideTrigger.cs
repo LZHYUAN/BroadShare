@@ -74,20 +74,20 @@ namespace beta
             {
                 axis = screen.X;
                 if (Side == Side.Right)
-                    axis += screen.Width-1;
-                if(pos.X == axis && pos.Y>(screen.Y+FrontRange) && pos.Y<(screen.Y+screen.Height-BottomRange))
+                    axis += screen.Width - 1;
+                if (pos.X == axis && pos.Y > (screen.Y + FrontRange) && pos.Y < (screen.Y + screen.Height - BottomRange))
                     trigger = true;
             }
             else
             {
                 axis = screen.Y;
                 if (Side == Side.Bottom)
-                    axis += screen.Height-1;
+                    axis += screen.Height - 1;
                 if (pos.Y == axis && pos.X > (screen.X + FrontRange) && pos.X < (screen.X + screen.Width - BottomRange))
                     trigger = true;
             }
 
-            
+
 
             if (trigger)
             {

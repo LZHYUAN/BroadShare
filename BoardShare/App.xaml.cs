@@ -40,11 +40,13 @@ namespace BoardShare
         {
             this.InitializeComponent();
 
-
-            var Ms = RawInputMouse.GetDevices().OfType<RawInputMouse>();
-            var M = Ms.Where(_ => _.ProductId != 0 && _.ManufacturerName == "Microsoft").First();
-            var _rawinput = new RawInput.MouseRawInputReceiveWindow(M);
-            _rawinput.RawInputEvent += _rawinput_RawInputEvent; 
+            new SideTrigger() { 
+            WithHover = true,
+            };
+            //var Ms = RawInputMouse.GetDevices().OfType<RawInputMouse>();
+            //var M = Ms.Where(_ => _.ProductId != 0 && _.ManufacturerName == "Microsoft").First();
+            //var _rawinput = new RawInput.MouseRawInputReceiveWindow(M);
+            //_rawinput.RawInputEvent += _rawinput_RawInputEvent; 
 
 
 
