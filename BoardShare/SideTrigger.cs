@@ -49,7 +49,6 @@ namespace BoardShare
         public bool WithHover { get; set; } = false;
 
         public event Action TriggerEvent;
-        public event Action LeaveEvent;
 
         private MouseRawInputReceiveWindow _rawinput;
 
@@ -64,14 +63,11 @@ namespace BoardShare
 
         long _lastTime = 0;
         long _startTime = 0;
-        bool _leftDown= false;
-        bool _rightDown= false;
-        POINT _lastPos =new POINT { X=0,Y =0} ;
+        bool _leftDown = false;
+        bool _rightDown = false;
         private void _rawinput_RawInputEvent(object sender, RawInputMouseData data)
         {
             GetCursorPos(out POINT pos);
-
-            bool trigger = true;
 
             //--PosCheck
             int axis = 0;
@@ -82,7 +78,7 @@ namespace BoardShare
                 if (Side == Side.Right)
                     axis += screen.Width - 1;
                 if (!(pos.X == axis && pos.Y > (screen.Y + FrontRange) && pos.Y < (screen.Y + screen.Height - BottomRange)))
-                    trigger = false;
+                    return;
             }
             else
             {
@@ -90,29 +86,26 @@ namespace BoardShare
                 if (Side == Side.Bottom)
                     axis += screen.Height - 1;
                 if (!(pos.Y == axis && pos.X > (screen.X + FrontRange) && pos.X < (screen.X + screen.Width - BottomRange)))
-                    trigger = false;
+                    return;
             }
 
             //--HoverCheck
-            if (data.Mouse.Buttons == RawMouseButtonFlags.LeftButtonDown) _leftDown=true;
-            if (data.Mouse.Buttons == RawMouseButtonFlags.RightButtonDown) _rightDown=true;
+            if (data.Mouse.Buttons == RawMouseButtonFlags.LeftButtonDown) _leftDown = true;
+            if (data.Mouse.Buttons == RawMouseButtonFlags.RightButtonDown) _rightDown = true;
             if (data.Mouse.Buttons == RawMouseButtonFlags.LeftButtonUp) _leftDown = false;
             if (data.Mouse.Buttons == RawMouseButtonFlags.RightButtonUp) _rightDown = false;
-            if (WithHover && !(_leftDown||_rightDown))
-                trigger = false;
+            if (WithHover && !(_leftDown || _rightDown))
+                return;
 
 
-            if (trigger)
+            //--TimeCheck
+            if (DateTime.Now.Ticks - _lastTime > 50_000)
+                _startTime = DateTime.Now.Ticks;
+            _lastTime = DateTime.Now.Ticks;
+            if (DateTime.Now.Ticks - _startTime > Duration * 10_000)
             {
-                //--TimeCheck
-                if (DateTime.Now.Ticks - _lastTime > 50_000)
-                    _startTime = DateTime.Now.Ticks;
-                _lastTime = DateTime.Now.Ticks;
-                if (DateTime.Now.Ticks - _startTime > Duration * 10_000)
-                {
-                    _lastTime = 0;
-                    _Trigger();
-                }
+                _lastTime = 0;
+                _Trigger();
             }
         }
 
@@ -120,11 +113,6 @@ namespace BoardShare
         {
             TriggerEvent?.Invoke();
             Debug.WriteLine("TriggerEvent");
-        }
-        private void _Leave()
-        {
-            LeaveEvent?.Invoke();
-            Debug.WriteLine("LeaveEvent");
         }
     }
 }
