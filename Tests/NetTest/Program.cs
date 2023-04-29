@@ -1,10 +1,8 @@
-﻿using static System.Net.Mime.MediaTypeNames;
-using System.ComponentModel;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Net;
 using System.Text;
 
-namespace NetTest   
+namespace NetTest
 {
     internal class Program
     {
@@ -28,9 +26,15 @@ namespace NetTest
             BroadcastMessage("ad", 9051);
             */
 
+            var N = new NetClient();
 
-            var C = new DynamicCenter(new byte[] { 0, 1, 2, 3 }, 9050);
-            C.Start();
+
+
+
+            Task.Delay(1000).Wait();
+
+
+            N.BoardcastFinder();
 
             Task.Delay(-1).Wait();
 
