@@ -30,7 +30,7 @@ namespace NetTest
 
                 ReceiveBroadcastMessage((EndPoint ep, string s) =>
                 {
-                    Console.WriteLine((ep as IPEndPoint).Address + " , " + s);
+                    Console.WriteLine(ep + " , " + s);
 
                 }, 12345);
 
