@@ -68,13 +68,19 @@ namespace NetTest
         }
         private Task _TcpLintener()
         {
-            TcpListener tcpListener = new TcpListener(IPAddress.Any, Port);
+            TcpListener tcpListener = new TcpListener(_dataBuilder.LocalAddress, Port);
             tcpListener.Start();
             while (_isLintening)
             {
                 _TcpRecevied(tcpListener.AcceptTcpClient());
             }
             return Task.CompletedTask;
+        }
+        private void _UdpRecevied(byte[] data, IPAddress address)
+        {
+            var dataType = _dataBuilder.GetDataType(data);
+            if (dataType == DataBuilder.DataType.ClientRequest)
+                _TrySendClientSync(address);
         }
         private void _TcpRecevied(TcpClient tcpClient)
         {
@@ -92,23 +98,18 @@ namespace NetTest
                 {
                     PhysicalAddress macObj = new PhysicalAddress(mac);
                     IPAddress ipObj = (stream.Socket.LocalEndPoint as IPEndPoint).Address;
-                    Debug.WriteLine("ClientReceived:" + ipObj + "," + macObj +","+ name);
-                   // if (!mac.SequenceEqual(_dataBuilder.LocalMac))
-                        Task.Run(()=>ClientReceived?.Invoke(ipObj, macObj, name));
+                    Debug.WriteLine("ClientReceived:" + ipObj + "," + macObj + "," + name);
+                    // if (!mac.SequenceEqual(_dataBuilder.LocalMac))
+                    Task.Run(() => ClientReceived?.Invoke(ipObj, macObj, name));
                 }
             }
-        }
-        private void _UdpRecevied(byte[] data, IPAddress address)
-        {
-            var dataType = _dataBuilder.GetDataType(data);
-            if (dataType == DataBuilder.DataType.ClientRequest)
-                _TrySendClientSync(address);
         }
 
         private async Task<bool> _TrySendClientSync(IPAddress address)
         {
             try
             {
+                _dataBuilder.RefreshLocalAddress();
                 using (TcpClient tcpClient = new TcpClient())
                 {
                     await tcpClient.ConnectAsync(address, Port);
@@ -137,6 +138,7 @@ namespace NetTest
                 if (string.IsNullOrEmpty(ClientName))
                     RefreshClientName();
                 RefreshLocalMac();
+                RefreshLocalAddress();
             }
 
             public void RefreshLocalMac()
@@ -148,6 +150,15 @@ namespace NetTest
                     throw new Exception("Can't find Local Mac");
                 LocalMac = net.GetPhysicalAddress().GetAddressBytes();
             }
+            public void RefreshLocalAddress()
+            {
+                IPAddress? ip = Dns.GetHostAddresses(Dns.GetHostName())
+                    .Where(_ => _.AddressFamily == AddressFamily.InterNetwork)
+                    .FirstOrDefault();
+                if (ip == null)
+                    throw new Exception("Can't find Local ip");
+                LocalAddress = ip;
+            }
             public void RefreshClientName()
             {
                 ClientName = Dns.GetHostName();
@@ -155,6 +166,7 @@ namespace NetTest
 
             public byte[] Title { get; }
             public byte[] LocalMac { private set; get; }
+            public IPAddress LocalAddress { private set; get; }
             public string ClientName { set; get; }
 
             public byte[] GetClientRequestBytes()
