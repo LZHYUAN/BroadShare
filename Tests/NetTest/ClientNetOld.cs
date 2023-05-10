@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace NetTest
 {
-    public class NetClient
+    public class NetClientOld
     {
         public string Name;
         public string IP;
@@ -19,7 +20,7 @@ namespace NetTest
         public bool IsLintening = false;
         private Task _UDPListenerTask;
         private Task _TCPListenerTask;
-        public NetClient(int port = 5543)
+        public NetClientOld(int port = 5543)
         {
             Port = port;
             IsLintening = true;
@@ -36,15 +37,13 @@ namespace NetTest
         {
             var sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             sock.Bind(new IPEndPoint(IPAddress.Any, Port));
-                sock.Listen(1);
-
+            sock.Listen(1);
             while (IsLintening)
             {
-                if (sock.Available>0)
-                {
-                    sock.Accept();
-                }
+
+           var C= sock.Accept();
                 Task.Delay(100).Wait();
+                C.Dispose();
             }
 
 
@@ -60,9 +59,10 @@ namespace NetTest
             while (IsLintening)
             {
                 var buffer = new byte[5];
+
                 var length = sock.ReceiveFrom(buffer, ref ep);
 
-                if (length == 5 && buffer.SequenceEqual(Title.Concat(new byte[] { 0 })))
+                if ( buffer.SequenceEqual(Title.Concat(new byte[] { 0 })))
                     UDPReceived(ep);
 
                 Task.Delay(500).Wait();
@@ -73,9 +73,19 @@ namespace NetTest
         private void UDPReceived(EndPoint ep)
         {
             var sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            var iep = ep as IPEndPoint;
-            iep.Port = Port;
-            sock.Connect(iep);
+            var iep = new IPEndPoint( (ep as IPEndPoint).Address,Port);
+            try
+            {
+                sock.Connect(iep);
+
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                sock.Dispose(); 
+            }
         }
 
         public void BoardcastFinder()
